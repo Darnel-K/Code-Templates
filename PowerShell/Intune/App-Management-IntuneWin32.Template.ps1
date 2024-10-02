@@ -1,9 +1,9 @@
 <#
 # #################################################################################################################### #
-# Filename: \Templates\Intune\App-Management-IntuneWin32.Template.ps1                                                  #
-# Repository: Private                                                                                                  #
-# Created Date: Thursday, July 4th 2024, 1:08:48 PM                                                                    #
-# Last Modified: Monday, August 19th 2024, 3:12:30 PM                                                                  #
+# Filename: \PowerShell\Intune\App-Management-IntuneWin32.Template.ps1                                                 #
+# Repository: Code-Templates                                                                                           #
+# Created Date: Tuesday, October 1st 2024, 10:01:10 PM                                                                 #
+# Last Modified: Wednesday, October 2nd 2024, 11:06:22 PM                                                              #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -325,6 +325,7 @@ $FULL_INSTALLED_SOFTWARE_PATH = "$INSTALL_DIRECTORY\$INSTALLED_EXECUTABLE"
 [Boolean]$IS_SYSTEM = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).Identities.IsSystem
 [Boolean]$IS_ADMIN = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 [String]$EXEC_USER = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).Identities.Name
+[Int]$PID = [System.Diagnostics.Process]::GetCurrentProcess().Id
 
 # Script & Terminal Preferences - DO NOT CHANGE!
 $ProgressPreference = "Continue"
@@ -336,7 +337,7 @@ $WarningPreference = "Continue"
 $host.ui.RawUI.WindowTitle = $SCRIPT_NAME
 
 # Initialise CustomLog class for event log
-$CUSTOM_LOG = [CustomLog]@{log_source = $SCRIPT_NAME }
+$CUSTOM_LOG = [CustomLog]::new($SCRIPT_NAME)
 $CUSTOM_LOG.InitEventLog()
 
 # Console Signature
@@ -425,13 +426,26 @@ $REG_DATA = @(
 
 # Define CustomLog class
 class CustomLog {
-    hidden [string] $log_name
+    [string] $log_name
     [string] $log_source
     hidden [Boolean] $event_log_init
 
     CustomLog() {
         $this.log_name = "ABYSS.ORG.UK"
         $this.event_log_init = $false
+        $this.log_source = "Default"
+    }
+
+    CustomLog([String]$log_source) {
+        $this.log_name = "ABYSS.ORG.UK"
+        $this.event_log_init = $false
+        $this.log_source = $log_source
+    }
+
+    CustomLog([String]$log_name, [String]$log_source) {
+        $this.log_name = $log_name
+        $this.event_log_init = $false
+        $this.log_source = $log_source
     }
 
     [void] InitEventLog() {
