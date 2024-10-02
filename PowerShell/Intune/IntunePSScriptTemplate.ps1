@@ -1,9 +1,9 @@
 <#
 # #################################################################################################################### #
-# Filename: \Templates\Intune\IntunePSScriptTemplate.ps1                                                               #
-# Repository: Private                                                                                                  #
-# Created Date: Friday, July 5th 2024, 9:03:56 AM                                                                      #
-# Last Modified: Wednesday, August 21st 2024, 3:36:36 PM                                                               #
+# Filename: \PowerShell\Intune\IntunePSScriptTemplate.ps1                                                              #
+# Repository: Code-Templates                                                                                           #
+# Created Date: Tuesday, October 1st 2024, 10:01:10 PM                                                                 #
+# Last Modified: Wednesday, October 2nd 2024, 11:06:22 PM                                                              #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -99,6 +99,7 @@ $SCRIPT_NAME = ".Intune.PSScript.$($SCRIPT_NAME.Replace(' ',''))"
 [Boolean]$IS_SYSTEM = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).Identities.IsSystem
 [Boolean]$IS_ADMIN = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 [String]$EXEC_USER = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).Identities.Name
+[Int]$PID = [System.Diagnostics.Process]::GetCurrentProcess().Id
 
 # Script & Terminal Preferences - DO NOT CHANGE!
 $ProgressPreference = "Continue"
@@ -110,7 +111,7 @@ $WarningPreference = "Continue"
 $host.ui.RawUI.WindowTitle = $SCRIPT_NAME
 
 # Initialise CustomLog class for event log
-$CUSTOM_LOG = [CustomLog]@{log_source = $SCRIPT_NAME }
+$CUSTOM_LOG = [CustomLog]::new($SCRIPT_NAME)
 $CUSTOM_LOG.InitEventLog()
 
 # Console Signature
@@ -123,13 +124,26 @@ function sig {
 
 # Define CustomLog class
 class CustomLog {
-    hidden [string] $log_name
+    [string] $log_name
     [string] $log_source
     hidden [Boolean] $event_log_init
 
     CustomLog() {
         $this.log_name = "ABYSS.ORG.UK"
         $this.event_log_init = $false
+        $this.log_source = "Default"
+    }
+
+    CustomLog([String]$log_source) {
+        $this.log_name = "ABYSS.ORG.UK"
+        $this.event_log_init = $false
+        $this.log_source = $log_source
+    }
+
+    CustomLog([String]$log_name, [String]$log_source) {
+        $this.log_name = $log_name
+        $this.event_log_init = $false
+        $this.log_source = $log_source
     }
 
     [void] InitEventLog() {
