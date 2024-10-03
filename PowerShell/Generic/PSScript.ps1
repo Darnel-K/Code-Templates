@@ -3,7 +3,7 @@
 # Filename: \PowerShell\Generic\PSScript.ps1                                                                           #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Tuesday, October 1st 2024, 10:01:10 PM                                                                 #
-# Last Modified: Wednesday, October 2nd 2024, 11:06:22 PM                                                              #
+# Last Modified: Thursday, October 3rd 2024, 9:11:01 PM                                                                #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -50,6 +50,8 @@
     A sample command that uses the function or script, optionally followed by sample output and a description. Repeat this keyword for each example.
 #>
 
+# Script parameters
+
 [CmdletBinding()]
 Param (
     [Parameter(Position = 0, Mandatory = $true, ValueFromPipeline = $true)]
@@ -58,8 +60,6 @@ Param (
     $Param1
 )
 
-$SCRIPT_NAME = "" # Do not leave this blank, this is used in the window title and the event log entries.
-
 # Script functions
 
 function init {
@@ -67,6 +67,17 @@ function init {
     # This function is called automatically at the bottom of the script
 
 }
+
+#################################
+#                               #
+#   REQUIRED SCRIPT VARIABLES   #
+#                               #
+#################################
+
+# DO NOT REMOVE THESE VARIABLES
+# DO NOT LEAVE THESE VARIABLES BLANK
+
+$SCRIPT_NAME = "" # This is used in the window title and the event log entries.
 
 ################################################
 #                                              #
@@ -94,7 +105,7 @@ function checkRunIn64BitPowershell {
     }
 }
 
-# Script Variables - DO NOT CHANGE!
+# Pre-defined Variables - DO NOT CHANGE!
 $SCRIPT_NAME = ".Generic.PSScript.$($SCRIPT_NAME.Replace(' ',''))"
 [Boolean]$IS_SYSTEM = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).Identities.IsSystem
 [Boolean]$IS_ADMIN = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -110,19 +121,19 @@ $VerbosePreference = "SilentlyContinue"
 $WarningPreference = "Continue"
 $host.ui.RawUI.WindowTitle = $SCRIPT_NAME
 
-# Initialise CustomLog class for event log
+# Create new instance of CustomLog class and initialise Event Log - DO NOT CHANGE!
 $CUSTOM_LOG = [CustomLog]::new($SCRIPT_NAME)
 $CUSTOM_LOG.InitEventLog()
 
-# Console Signature
+# Console Signature - DO NOT CHANGE!
 $SCRIPT_FILENAME = $MyInvocation.MyCommand.Name
 function sig {
     $len = @(($SCRIPT_NAME.Length + 13), ($SCRIPT_FILENAME.Length + 10), 20, 42, 29, 40, 63, 62, 61, 44)
     $len_max = ($len | Measure-Object -Maximum).Maximum
-    Write-Host "`t####$('#'*$len_max)####`n`t#   $(' '*$len_max)   #`n`t#   Script Name: $($SCRIPT_NAME)$(' '*($len_max-$len[0]))   #`n`t#   Filename: $($SCRIPT_FILENAME)$(' '*($len_max-$len[1]))   #`n`t#   $(' '*$len_max)   #`n`t#   Author: Darnel Kumar$(' '*($len_max-$len[2]))   #`n`t#   Author GitHub: https://github.com/Darnel-K$(' '*($len_max-$len[3]))   #`n`t#   Copyright $([char]0x00A9) $(Get-Date -Format  'yyyy') Darnel Kumar$(' '*($len_max-$len[4]))   #`n`t#   $(' '*$len_max)   #`n`t#   $('-'*$len_max)   #`n`t#   $(' '*$len_max)   #`n`t#   License: GNU General Public License v3.0$(' '*($len_max-$len[5]))   #`n`t#   $(' '*$len_max)   #`n`t#   This program is distributed in the hope that it will be useful,$(' '*($len_max-$len[6]))   #`n`t#   but WITHOUT ANY WARRANTY; without even the implied warranty of$(' '*($len_max-$len[7]))   #`n`t#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the$(' '*($len_max-$len[8]))   #`n`t#   GNU General Public License for more details.$(' '*($len_max-$len[9]))   #`n`t#   $(' '*$len_max)   #`n`t####$('#'*$len_max)####" -ForegroundColor Green
+    Write-Host "`t####$('#'*$len_max)####`n`t#   $(' '*$len_max)   #`n`t#   Script Name: $($SCRIPT_NAME)$(' '*($len_max-$len[0]))   #`n`t#   Filename: $($SCRIPT_FILENAME)$(' '*($len_max-$len[1]))   #`n`t#   $(' '*$len_max)   #`n`t#   Author: Darnel Kumar$(' '*($len_max-$len[2]))   #`n`t#   Author GitHub: https://github.com/Darnel-K$(' '*($len_max-$len[3]))   #`n`t#   Copyright $([char]0x00A9) $(Get-Date -Format  'yyyy') Darnel Kumar$(' '*($len_max-$len[4]))   #`n`t#   $(' '*$len_max)   #`n`t#   $('-'*$len_max)   #`n`t#   $(' '*$len_max)   #`n`t#   License: GNU General Public License v3.0$(' '*($len_max-$len[5]))   #`n`t#   $(' '*$len_max)   #`n`t#   This program is distributed in the hope that it will be useful,$(' '*($len_max-$len[6]))   #`n`t#   but WITHOUT ANY WARRANTY; without even the implied warranty of$(' '*($len_max-$len[7]))   #`n`t#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the$(' '*($len_max-$len[8]))   #`n`t#   GNU General Public License for more details.$(' '*($len_max-$len[9]))   #`n`t#   $(' '*$len_max)   #`n`t####$('#'*$len_max)####`n" -ForegroundColor Green
 }
 
-# Define CustomLog class
+# Define CustomLog class - DO NOT CHANGE!
 class CustomLog {
     [string] $log_name
     [string] $log_source
