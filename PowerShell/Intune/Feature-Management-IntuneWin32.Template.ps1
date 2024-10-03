@@ -3,7 +3,7 @@
 # Filename: \PowerShell\Intune\Feature-Management-IntuneWin32.Template.ps1                                             #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Tuesday, October 1st 2024, 10:01:10 PM                                                                 #
-# Last Modified: Wednesday, October 2nd 2024, 11:06:22 PM                                                              #
+# Last Modified: Thursday, October 3rd 2024, 9:21:43 PM                                                                #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -29,7 +29,7 @@
 .SYNOPSIS
     Enable/Disable optional feature {App}
 .DESCRIPTION
-    App managment script for enabling, disabling & detecting optional feature {App}
+    App management script for enabling, disabling & detecting optional feature {App}
 .EXAMPLE
     & .\Feature-Management-IntuneWin32.Template.ps1
 .Example
@@ -56,9 +56,12 @@ Param (
 
 #################################
 #                               #
-#   USER CHANGEABLE VARIABLES   #
+#   REQUIRED SCRIPT VARIABLES   #
 #                               #
 #################################
+
+# DO NOT REMOVE THESE VARIABLES
+# DO NOT LEAVE THESE VARIABLES BLANK
 
 $FRIENDLY_FEATURE_NAME = "" # Name of the feature (Hyper-V, IIS, Telnet)
 $FEATURE_COMPONENTS = @( # The feature names to install, this information can be found by running "Get-WindowsOptionalFeature -Online". (Example: Microsoft-Hyper-V-Management-PowerShell, Microsoft-Hyper-V-Services)
@@ -66,14 +69,13 @@ $FEATURE_COMPONENTS = @( # The feature names to install, this information can be
 )
 $ENABLE_PARENT_FEATURES = $false
 
-
 ################################################
 #                                              #
 #   DO NOT EDIT ANYTHING BELOW THIS MESSAGE!   #
 #                                              #
 ################################################
 
-# Script functions
+# Script functions - DO NOT CHANGE!
 
 function init {
     switch ($Mode) {
@@ -313,7 +315,7 @@ function checkRunIn64BitPowershell {
     }
 }
 
-# Script Variables - DO NOT CHANGE!
+# Pre-defined Variables - DO NOT CHANGE!
 $SCRIPT_NAME = ".Intune.Win32App.OptFeature-$($FRIENDLY_FEATURE_NAME.Replace(' ',''))"
 [Boolean]$IS_SYSTEM = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).Identities.IsSystem
 [Boolean]$IS_ADMIN = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -329,11 +331,11 @@ $VerbosePreference = "SilentlyContinue"
 $WarningPreference = "Continue"
 $host.ui.RawUI.WindowTitle = $SCRIPT_NAME
 
-# Initialise CustomLog class for event log
+# Create new instance of CustomLog class and initialise Event Log - DO NOT CHANGE!
 $CUSTOM_LOG = [CustomLog]::new($SCRIPT_NAME)
 $CUSTOM_LOG.InitEventLog()
 
-# Console Signature
+# Console Signature - DO NOT CHANGE!
 $SCRIPT_FILENAME = $MyInvocation.MyCommand.Name
 function sig {
     $len = @(($SCRIPT_NAME.Length + 13), ($SCRIPT_FILENAME.Length + 10), 20, 42, 29, 40, 63, 62, 61, 44)
@@ -341,7 +343,7 @@ function sig {
     Write-Host "`t####$('#'*$len_max)####`n`t#   $(' '*$len_max)   #`n`t#   Script Name: $($SCRIPT_NAME)$(' '*($len_max-$len[0]))   #`n`t#   Filename: $($SCRIPT_FILENAME)$(' '*($len_max-$len[1]))   #`n`t#   $(' '*$len_max)   #`n`t#   Author: Darnel Kumar$(' '*($len_max-$len[2]))   #`n`t#   Author GitHub: https://github.com/Darnel-K$(' '*($len_max-$len[3]))   #`n`t#   Copyright $([char]0x00A9) $(Get-Date -Format  'yyyy') Darnel Kumar$(' '*($len_max-$len[4]))   #`n`t#   $(' '*$len_max)   #`n`t#   $('-'*$len_max)   #`n`t#   $(' '*$len_max)   #`n`t#   License: GNU General Public License v3.0$(' '*($len_max-$len[5]))   #`n`t#   $(' '*$len_max)   #`n`t#   This program is distributed in the hope that it will be useful,$(' '*($len_max-$len[6]))   #`n`t#   but WITHOUT ANY WARRANTY; without even the implied warranty of$(' '*($len_max-$len[7]))   #`n`t#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the$(' '*($len_max-$len[8]))   #`n`t#   GNU General Public License for more details.$(' '*($len_max-$len[9]))   #`n`t#   $(' '*$len_max)   #`n`t####$('#'*$len_max)####`n" -ForegroundColor Green
 }
 
-# Set registry variables, paths & keys
+# Set registry variables, paths & keys - DO NOT CHANGE!
 if ($IS_SYSTEM) { $REG_KEY_ROOT = 'HKLM:\' } else { $REG_KEY_ROOT = 'HKCU:\' }
 $REG_KEY_PATH = "Software\ABYSS.ORG.UK\MDM-FEATURE-MANAGEMENT\$SCRIPT_NAME"
 $REG_KEY_FULL_PATH = "$REG_KEY_ROOT$REG_KEY_PATH"
@@ -408,7 +410,7 @@ foreach ($feature in $FEATURE_COMPONENTS) {
     }
 }
 
-# Define CustomLog class
+# Define CustomLog class - DO NOT CHANGE!
 class CustomLog {
     [string] $log_name
     [string] $log_source
