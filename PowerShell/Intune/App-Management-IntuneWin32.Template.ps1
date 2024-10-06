@@ -3,7 +3,7 @@
 # Filename: \PowerShell\Intune\App-Management-IntuneWin32.Template.ps1                                                 #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Tuesday, October 1st 2024, 10:01:10 PM                                                                 #
-# Last Modified: Thursday, October 3rd 2024, 9:21:43 PM                                                                #
+# Last Modified: Sunday, October 6th 2024, 8:53:30 PM                                                                  #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -68,6 +68,7 @@ $APP_VERSION = "0" # App version to be installed
 $INSTALLER_PATH = "" # Path to installer executable file (exe, msi, ect)
 $INSTALLER_EXECUTABLE = "" # Filename of the installer executable
 $INSTALLER_ARGUMENTS = "" # Arguments for the installer executable to enable silent installation & other features
+$INSTALLER_RESTART_EXITCODE = 3010 # Change this to the expected exit code for a successful install that requires a restart for your application. This script is compatible with Intune and will exit with the code 3010 when the code specified here is detected
 $INSTALL_DIRECTORY = "" # Folder path that the software is installed
 $INSTALLED_EXECUTABLE = "" # Installed software executable
 $UNINSTALLER_PATH = $INSTALL_DIRECTORY # Path to uninstaller executable. Default set to installer path
@@ -83,6 +84,7 @@ $UNINSTALLER_ARGUMENTS = "" # Arguments for the uninstaller executable to enable
 # Script functions - DO NOT CHANGE!
 
 function init {
+    $CUSTOM_LOG.Information("Script PID: $PID")
     switch ($Mode) {
         'Install' {
             $CUSTOM_LOG.Information("Starting $SCRIPT_NAME in $Mode mode")
@@ -130,26 +132,62 @@ function installApp {
 function forceInstallApp {
     $CUSTOM_LOG.Information("Attempting to install $APP_NAME, please wait")
     try {
-        if ($IS_ADMIN) {
-            Start-Process -FilePath "$FULL_INSTALLER_PATH" -Wait -WindowStyle Hidden -ArgumentList "$INSTALLER_ARGUMENTS" -Verb RunAs
+        if ($IS_SYSTEM) {
+            $process = Start-Process -FilePath "$FULL_INSTALLER_PATH" -Wait -PassThru -WindowStyle Hidden -ArgumentList "$INSTALLER_ARGUMENTS" -Verb RunAs
         }
         else {
-            Start-Process -FilePath "$FULL_INSTALLER_PATH" -Wait -WindowStyle Hidden -ArgumentList "$INSTALLER_ARGUMENTS"
+            $process = Start-Process -FilePath "$FULL_INSTALLER_PATH" -Wait -PassThru -WindowStyle Hidden -ArgumentList "$INSTALLER_ARGUMENTS"
         }
     }
     catch {
         $CUSTOM_LOG.Error("Unable to install $APP_NAME")
         $CUSTOM_LOG.Error($Error[0])
+        $CUSTOM_LOG.Error(($process | ConvertTo-Json))
         Exit 1
     }
     if (detectAppInstallState) {
-        $CUSTOM_LOG.Success("$APP_NAME has been installed successfully")
-        setAllRegKeys
+        switch ($process.ExitCode) {
+            0 {
+                $CUSTOM_LOG.Success("$APP_NAME has been installed successfully")
+                setAllRegKeys
+                Exit 0
+            }
+            1707 {
+                $CUSTOM_LOG.Success("$APP_NAME has been installed successfully")
+                setAllRegKeys
+                Exit 1707
+            }
+            3010 {
+                $CUSTOM_LOG.Success("A reboot is required to complete the installation of '$APP_NAME'")
+                setAllRegKeys
+                Exit 3010
+            }
+            1641 {
+                $CUSTOM_LOG.Success("A reboot is required to complete the installation of '$APP_NAME'")
+                setAllRegKeys
+                Exit 1641
+            }
+            $INSTALLER_RESTART_EXITCODE {
+                $CUSTOM_LOG.Success("A reboot is required to complete the installation of '$APP_NAME'")
+                setAllRegKeys
+                Exit 3010
+            }
+            1618 {
+                $CUSTOM_LOG.Error("Something went wrong during the installation of '$APP_NAME'")
+                $CUSTOM_LOG.Error(($process | ConvertTo-Json))
+                Exit 1618
+            }
+            Default {
+                $CUSTOM_LOG.Warning("An unknown exit code was detected at the end of the installation of '$APP_NAME'.`nExit Code: $($process.ExitCode)`n$APP_NAME was detected in the expected install location.")
+                Exit 0
+            }
+        }
         Exit 0
     }
     else {
         $CUSTOM_LOG.Fail("Unable to install $APP_NAME")
         $CUSTOM_LOG.Error("An unknown error has occured")
+        $CUSTOM_LOG.Error(($process | ConvertTo-Json))
         Exit 1
     }
 }
@@ -158,16 +196,17 @@ function uninstallApp {
     if ((detectAppInstallState) -or $Force) {
         $CUSTOM_LOG.Information("Attempting to uninstall $APP_NAME, please wait")
         try {
-            if ($IS_ADMIN) {
-                Start-Process -FilePath "$FULL_UNINSTALLER_PATH" -Wait -WindowStyle Hidden -ArgumentList "$UNINSTALLER_ARGUMENTS" -Verb RunAs
+            if ($IS_SYSTEM) {
+                $process = Start-Process -FilePath "$FULL_UNINSTALLER_PATH" -Wait -PassThru -WindowStyle Hidden -ArgumentList "$UNINSTALLER_ARGUMENTS" -Verb RunAs
             }
             else {
-                Start-Process -FilePath "$FULL_UNINSTALLER_PATH" -Wait -WindowStyle Hidden -ArgumentList "$UNINSTALLER_ARGUMENTS"
+                $process = Start-Process -FilePath "$FULL_UNINSTALLER_PATH" -Wait -PassThru -WindowStyle Hidden -ArgumentList "$UNINSTALLER_ARGUMENTS"
             }
         }
         catch {
             $CUSTOM_LOG.Error("Unable to uninstall $APP_NAME")
             $CUSTOM_LOG.Error($Error[0])
+            $CUSTOM_LOG.Error(($process | ConvertTo-Json))
             Exit 1
         }
         if (-not (detectAppInstallState)) {
@@ -178,6 +217,7 @@ function uninstallApp {
         else {
             $CUSTOM_LOG.Fail("Unable to uninstall $APP_NAME")
             $CUSTOM_LOG.Error("An unknown error has occured")
+            $CUSTOM_LOG.Error(($process | ConvertTo-Json))
             Exit 1
         }
     }
@@ -190,6 +230,7 @@ function uninstallApp {
 function detectAppInstallState {
     if (Test-Path "$FULL_INSTALLED_SOFTWARE_PATH" -PathType Leaf) {
         $CUSTOM_LOG.Information("'$APP_NAME' is installed on this device")
+        $CUSTOM_LOG.Information("Installation path for '$APP_NAME' is '$FULL_INSTALLED_SOFTWARE_PATH'")
         return $true
     }
     else {
