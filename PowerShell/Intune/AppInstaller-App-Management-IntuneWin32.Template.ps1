@@ -3,7 +3,7 @@
 # Filename: \PowerShell\Intune\AppInstaller-App-Management-IntuneWin32.Template.ps1                                    #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Thursday, November 21st 2024, 12:37:06 PM                                                              #
-# Last Modified: Thursday, November 21st 2024, 3:13:43 PM                                                              #
+# Last Modified: Monday, November 25th 2024, 4:38:53 PM                                                                #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -43,7 +43,7 @@
 [CmdletBinding()]
 Param (
     [Parameter()]
-    [ValidateSet("Enable", "Disable", "Detect")]
+    [ValidateSet("Install", "Uninstall", "Detect")]
     [PSDefaultValue(Help = 'Defaults to detection mode')]
     [string[]]
     # Specifies which mode the script should run in. Enable Mode, Disable Mode or Detection Mode.
@@ -81,17 +81,17 @@ $ENABLE_PARENT_FEATURES = $false
 
 function init {
     switch ($Mode) {
-        'Enable' {
+        'Install' {
             $CUSTOM_LOG.Information("Starting $SCRIPT_NAME in $Mode mode")
-            enableFeature
+            installAppInstaller
         }
-        'Disable' {
+        'Uninstall' {
             $CUSTOM_LOG.Information("Starting $SCRIPT_NAME in $Mode mode")
-            disableFeature
+            uninstallAppInstaller
         }
         'Detect' {
             $CUSTOM_LOG.Information("Starting $SCRIPT_NAME in $Mode mode")
-            switch (detectFeatureState) {
+            switch (detectAppState) {
                 0 {
                     Exit 1
                 }
@@ -108,7 +108,7 @@ function init {
         }
         Default {
             $CUSTOM_LOG.Information("Starting $SCRIPT_NAME in $Mode mode")
-            switch (detectFeatureState) {
+            switch (detectAppState) {
                 0 {
                     Exit 1
                 }
@@ -126,8 +126,8 @@ function init {
     }
 }
 
-function enableFeature {
-    if (-not ((detectFeatureState) -eq 1) -or $Force) {
+function installAppInstaller {
+    if (-not ((detectAppState) -eq 1) -or $Force) {
         $CUSTOM_LOG.Information("Attempting to enable $FRIENDLY_FEATURE_NAME, please wait")
         :enable_feature foreach ($feature in $FEATURE_COMPONENTS) {
             $CUSTOM_LOG.Information("Enabling feature: '$feature'")
@@ -140,7 +140,7 @@ function enableFeature {
                 break enable_feature
             }
         }
-        if ((detectFeatureState) -eq 1) {
+        if ((detectAppState) -eq 1) {
             $CUSTOM_LOG.Success("$FRIENDLY_FEATURE_NAME has been enabled successfully")
             setAllRegKeys
             Exit 0
@@ -157,8 +157,8 @@ function enableFeature {
     }
 }
 
-function disableFeature {
-    if (-not ((detectFeatureState) -eq 0) -or $Force) {
+function uninstallAppInstaller {
+    if (-not ((detectAppState) -eq 0) -or $Force) {
         $CUSTOM_LOG.Information("Attempting to disable feature: '$FRIENDLY_FEATURE_NAME'")
         :disable_feature foreach ($feature in $FEATURE_COMPONENTS) {
             $CUSTOM_LOG.Information("Disabling feature: '$feature'")
@@ -171,7 +171,7 @@ function disableFeature {
                 break disable_feature
             }
         }
-        if ((detectFeatureState) -eq 0) {
+        if ((detectAppState) -eq 0) {
             $CUSTOM_LOG.Success("$FRIENDLY_FEATURE_NAME has been disabled successfully")
             removeRegKey
             Exit 0
@@ -188,7 +188,7 @@ function disableFeature {
     }
 }
 
-function detectFeatureState {
+function detectAppState {
     $all_features_installed = 0
     $feature_install_states = @()
     $CUSTOM_LOG.Information("Checking feature install state(s)")
