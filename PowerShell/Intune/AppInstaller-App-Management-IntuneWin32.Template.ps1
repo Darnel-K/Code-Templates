@@ -3,7 +3,7 @@
 # Filename: \PowerShell\Intune\AppInstaller-App-Management-IntuneWin32.Template.ps1                                    #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Thursday, November 21st 2024, 12:37:06 PM                                                              #
-# Last Modified: Monday, November 25th 2024, 4:38:53 PM                                                                #
+# Last Modified: Tuesday, November 26th 2024, 4:12:49 PM                                                               #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -64,12 +64,8 @@ Param (
 # DO NOT LEAVE THESE VARIABLES BLANK
 
 $APP_NAME = "" # Name of the software (Bitwarden, Python, Google Chrome)
-
-$FRIENDLY_FEATURE_NAME = "" # Name of the feature (Hyper-V, IIS, Telnet)
-$FEATURE_COMPONENTS = @( # The feature names to install, this information can be found by running "Get-WindowsOptionalFeature -Online". (Example: Microsoft-Hyper-V-Management-PowerShell, Microsoft-Hyper-V-Services)
-    ""
-)
-$ENABLE_PARENT_FEATURES = $false
+$APP_VERSION = "0" # App version to be installed
+$PACKAGE_FAMILY_NAME = $null # Leave as null if not known
 
 ################################################
 #                                              #
@@ -189,38 +185,41 @@ function uninstallAppInstaller {
 }
 
 function detectAppState {
-    $all_features_installed = 0
-    $feature_install_states = @()
-    $CUSTOM_LOG.Information("Checking feature install state(s)")
-    :feature_state_detection foreach ($feature in $FEATURE_COMPONENTS) {
-        $CUSTOM_LOG.Information("Checking install state for feature: '$feature'")
-        try {
-            if ((Get-WindowsOptionalFeature -Online -FeatureName "$feature").State -eq "Enabled") {
-                $feature_install_states += [PSCustomObject]@{ Feature = "$feature"; InstallState = $true }
-                $CUSTOM_LOG.Information("Feature: '$feature' is enabled")
-            }
-            else {
-                $feature_install_states += [PSCustomObject]@{ Feature = "$feature"; InstallState = $false }
-                $CUSTOM_LOG.Information("Feature: '$feature' is disabled")
-            }
-        }
-        catch {
-            $CUSTOM_LOG.Error("Unable to check install state for feature: '$feature'")
-            $CUSTOM_LOG.Error($Error[0])
-            $feature_install_states += [PSCustomObject]@{ Feature = "$feature"; InstallState = $false }
-            break feature_state_detection
-        }
-    }
-    if ((($feature_install_states | Where-Object -Property InstallState -eq $true | Measure-Object).Count) -eq ($feature_install_states.Count)) {
-        $all_features_installed = 1 # Fully installed
-    }
-    elseif ((($feature_install_states | Where-Object -Property InstallState -eq $false | Measure-Object).Count) -eq ($feature_install_states.Count)) {
-        $all_features_installed = 0 # Fully uninstalled
+    if ($PACKAGE_FAMILY_NAME -ne $null) {
+        $packagesFound = Get-AppxPackage | Where-Object { $_.PackageFamilyName -Like "*$PACKAGE_FAMILY_NAME*" }
     }
     else {
-        $all_features_installed = -1 # Partially installed/uninstalled
+        $packagesFound = Get-AppxPackage | Where-Object { $_.Name -Like "*$APP_NAME*" -or $_.PackageFamilyName -Like "*$PACKAGE_FAMILY_NAME*" }
     }
-    return $all_features_installed
+    # if (Test-Path "$FULL_INSTALLED_SOFTWARE_PATH" -PathType Leaf) {
+    #     $CUSTOM_LOG.Information("'$APP_NAME' is installed on this device")
+    #     $CUSTOM_LOG.Information("Installation path for '$APP_NAME' is '$FULL_INSTALLED_SOFTWARE_PATH'")
+    #     return $true
+    # }
+    # else {
+    #     $CUSTOM_LOG.Information("'$APP_NAME' is not installed on this device")
+    #     return $false
+    # }
+    # $all_features_installed = 0
+    # $feature_install_states = @()
+    # $CUSTOM_LOG.Information("Checking application install state")
+    # try {
+    #     if ((Get-WindowsOptionalFeature -Online -FeatureName "$feature").State -eq "Enabled") {
+    #         $feature_install_states += [PSCustomObject]@{ Feature = "$feature"; InstallState = $true }
+    #         $CUSTOM_LOG.Information("Feature: '$feature' is enabled")
+    #     }
+    #     else {
+    #         $feature_install_states += [PSCustomObject]@{ Feature = "$feature"; InstallState = $false }
+    #         $CUSTOM_LOG.Information("Feature: '$feature' is disabled")
+    #     }
+    # }
+    # catch {
+    #     $CUSTOM_LOG.Error("Unable to check install state for feature: '$feature'")
+    #     $CUSTOM_LOG.Error($Error[0])
+    #     $feature_install_states += [PSCustomObject]@{ Feature = "$feature"; InstallState = $false }
+    #     break feature_state_detection
+    # }
+    # return $all_features_installed
 }
 
 function setAllRegKeys {
