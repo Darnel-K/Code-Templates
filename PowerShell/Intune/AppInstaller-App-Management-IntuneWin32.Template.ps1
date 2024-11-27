@@ -3,7 +3,7 @@
 # Filename: \PowerShell\Intune\AppInstaller-App-Management-IntuneWin32.Template.ps1                                    #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Thursday, November 21st 2024, 12:37:06 PM                                                              #
-# Last Modified: Tuesday, November 26th 2024, 4:12:49 PM                                                               #
+# Last Modified: Wednesday, November 27th 2024, 5:22:10 PM                                                             #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -123,103 +123,83 @@ function init {
 }
 
 function installAppInstaller {
-    if (-not ((detectAppState) -eq 1) -or $Force) {
-        $CUSTOM_LOG.Information("Attempting to enable $FRIENDLY_FEATURE_NAME, please wait")
-        :enable_feature foreach ($feature in $FEATURE_COMPONENTS) {
-            $CUSTOM_LOG.Information("Enabling feature: '$feature'")
-            try {
-                Enable-WindowsOptionalFeature -Online -FeatureName "$feature" -All:$ENABLE_PARENT_FEATURES -NoRestart -WarningAction SilentlyContinue | Out-Null
-            }
-            catch {
-                $CUSTOM_LOG.Error("Unable to enable feature: '$feature'")
-                $CUSTOM_LOG.Error($Error[0])
-                break enable_feature
-            }
-        }
-        if ((detectAppState) -eq 1) {
-            $CUSTOM_LOG.Success("$FRIENDLY_FEATURE_NAME has been enabled successfully")
-            setAllRegKeys
-            Exit 0
-        }
-        else {
-            $CUSTOM_LOG.Fail("Unable to enable $FRIENDLY_FEATURE_NAME")
-            $CUSTOM_LOG.Error("An unknown error has occured")
-            Exit 1
-        }
-    }
-    else {
-        $CUSTOM_LOG.Information("$FRIENDLY_FEATURE_NAME is already enabled.")
-        Exit 0
-    }
+    # if (-not ((detectAppState) -eq 1) -or $Force) {
+    #     $CUSTOM_LOG.Information("Attempting to enable $FRIENDLY_FEATURE_NAME, please wait")
+    #     :enable_feature foreach ($feature in $FEATURE_COMPONENTS) {
+    #         $CUSTOM_LOG.Information("Enabling feature: '$feature'")
+    #         try {
+    #             Enable-WindowsOptionalFeature -Online -FeatureName "$feature" -All:$ENABLE_PARENT_FEATURES -NoRestart -WarningAction SilentlyContinue | Out-Null
+    #         }
+    #         catch {
+    #             $CUSTOM_LOG.Error("Unable to enable feature: '$feature'")
+    #             $CUSTOM_LOG.Error($Error[0])
+    #             break enable_feature
+    #         }
+    #     }
+    #     if ((detectAppState) -eq 1) {
+    #         $CUSTOM_LOG.Success("$FRIENDLY_FEATURE_NAME has been enabled successfully")
+    #         setAllRegKeys
+    #         Exit 0
+    #     }
+    #     else {
+    #         $CUSTOM_LOG.Fail("Unable to enable $FRIENDLY_FEATURE_NAME")
+    #         $CUSTOM_LOG.Error("An unknown error has occured")
+    #         Exit 1
+    #     }
+    # }
+    # else {
+    #     $CUSTOM_LOG.Information("$FRIENDLY_FEATURE_NAME is already enabled.")
+    #     Exit 0
+    # }
 }
 
 function uninstallAppInstaller {
-    if (-not ((detectAppState) -eq 0) -or $Force) {
-        $CUSTOM_LOG.Information("Attempting to disable feature: '$FRIENDLY_FEATURE_NAME'")
-        :disable_feature foreach ($feature in $FEATURE_COMPONENTS) {
-            $CUSTOM_LOG.Information("Disabling feature: '$feature'")
-            try {
-                Disable-WindowsOptionalFeature -Online -FeatureName "$feature" -NoRestart -WarningAction SilentlyContinue | Out-Null
-            }
-            catch {
-                $CUSTOM_LOG.Error("Unable to disable feature: '$feature'")
-                $CUSTOM_LOG.Error($Error[0])
-                break disable_feature
-            }
-        }
-        if ((detectAppState) -eq 0) {
-            $CUSTOM_LOG.Success("$FRIENDLY_FEATURE_NAME has been disabled successfully")
-            removeRegKey
-            Exit 0
-        }
-        else {
-            $CUSTOM_LOG.Fail("Unable to disable $FRIENDLY_FEATURE_NAME")
-            $CUSTOM_LOG.Error("An unknown error has occured")
-            Exit 1
-        }
-    }
-    else {
-        $CUSTOM_LOG.Information("$FRIENDLY_FEATURE_NAME is already uninstalled.")
-        Exit 0
-    }
+    # if (-not ((detectAppState) -eq 0) -or $Force) {
+    #     $CUSTOM_LOG.Information("Attempting to disable feature: '$FRIENDLY_FEATURE_NAME'")
+    #     :disable_feature foreach ($feature in $FEATURE_COMPONENTS) {
+    #         $CUSTOM_LOG.Information("Disabling feature: '$feature'")
+    #         try {
+    #             Disable-WindowsOptionalFeature -Online -FeatureName "$feature" -NoRestart -WarningAction SilentlyContinue | Out-Null
+    #         }
+    #         catch {
+    #             $CUSTOM_LOG.Error("Unable to disable feature: '$feature'")
+    #             $CUSTOM_LOG.Error($Error[0])
+    #             break disable_feature
+    #         }
+    #     }
+    #     if ((detectAppState) -eq 0) {
+    #         $CUSTOM_LOG.Success("$FRIENDLY_FEATURE_NAME has been disabled successfully")
+    #         removeRegKey
+    #         Exit 0
+    #     }
+    #     else {
+    #         $CUSTOM_LOG.Fail("Unable to disable $FRIENDLY_FEATURE_NAME")
+    #         $CUSTOM_LOG.Error("An unknown error has occured")
+    #         Exit 1
+    #     }
+    # }
+    # else {
+    #     $CUSTOM_LOG.Information("$FRIENDLY_FEATURE_NAME is already uninstalled.")
+    #     Exit 0
+    # }
 }
 
 function detectAppState {
+    $CUSTOM_LOG.Information("Checking application install state")
     if ($PACKAGE_FAMILY_NAME -ne $null) {
         $packagesFound = Get-AppxPackage | Where-Object { $_.PackageFamilyName -Like "*$PACKAGE_FAMILY_NAME*" }
     }
     else {
         $packagesFound = Get-AppxPackage | Where-Object { $_.Name -Like "*$APP_NAME*" -or $_.PackageFamilyName -Like "*$PACKAGE_FAMILY_NAME*" }
     }
-    # if (Test-Path "$FULL_INSTALLED_SOFTWARE_PATH" -PathType Leaf) {
-    #     $CUSTOM_LOG.Information("'$APP_NAME' is installed on this device")
-    #     $CUSTOM_LOG.Information("Installation path for '$APP_NAME' is '$FULL_INSTALLED_SOFTWARE_PATH'")
-    #     return $true
-    # }
-    # else {
-    #     $CUSTOM_LOG.Information("'$APP_NAME' is not installed on this device")
-    #     return $false
-    # }
-    # $all_features_installed = 0
-    # $feature_install_states = @()
-    # $CUSTOM_LOG.Information("Checking application install state")
-    # try {
-    #     if ((Get-WindowsOptionalFeature -Online -FeatureName "$feature").State -eq "Enabled") {
-    #         $feature_install_states += [PSCustomObject]@{ Feature = "$feature"; InstallState = $true }
-    #         $CUSTOM_LOG.Information("Feature: '$feature' is enabled")
-    #     }
-    #     else {
-    #         $feature_install_states += [PSCustomObject]@{ Feature = "$feature"; InstallState = $false }
-    #         $CUSTOM_LOG.Information("Feature: '$feature' is disabled")
-    #     }
-    # }
-    # catch {
-    #     $CUSTOM_LOG.Error("Unable to check install state for feature: '$feature'")
-    #     $CUSTOM_LOG.Error($Error[0])
-    #     $feature_install_states += [PSCustomObject]@{ Feature = "$feature"; InstallState = $false }
-    #     break feature_state_detection
-    # }
-    # return $all_features_installed
+    if ($packagesFound -gt 0) {
+        $CUSTOM_LOG.Information("'$APP_NAME' is installed on this device")
+        return $true
+    }
+    else {
+        $CUSTOM_LOG.Information("'$APP_NAME' is not installed on this device")
+        return $false
+    }
 }
 
 function setAllRegKeys {
@@ -289,6 +269,34 @@ function removeRegKey {
         }
     }
     $CUSTOM_LOG.Success("Completed registry update successfully.")
+}
+
+function checkRegKeyAppVersionMismath {
+    $CUSTOM_LOG.Information("Checking application current version")
+    # if (Test-Path -Path $REG_KEY_FULL_PATH) {
+    #     try {
+    #         $installed_app_version = Get-ItemProperty -Path $REG_KEY_FULL_PATH -Name "ApplicationVersion" | Select-Object -ExpandProperty ApplicationVersion
+    #         $CUSTOM_LOG.Information("Installed Version: $installed_app_version")
+    #         $CUSTOM_LOG.Information("Packaged Version: $APP_VERSION")
+    #         if ($APP_VERSION -ne $installed_app_version) {
+    #             $CUSTOM_LOG.Information("Detected version mismatch between the installed application and the packaged version")
+    #             return $true
+    #         }
+    #         else {
+    #             $CUSTOM_LOG.Information("Detected identical version between the installed application and the packaged version")
+    #             return $false
+    #         }
+    #     }
+    #     catch {
+    #         $CUSTOM_LOG.Fail("Unable to check installed app version. Registry keys likely don't exist. Assuming the packaged version is different.")
+    #         $CUSTOM_LOG.Error($Error[0])
+    #         return $true
+    #     }
+    # }
+    # else {
+    #     $CUSTOM_LOG.Fail("Unable to check installed app version. Registry keys likely don't exist. Assuming the packaged version is different.")
+    #     return $true
+    # }
 }
 
 function checkRunIn64BitPowershell {
