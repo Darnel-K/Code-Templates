@@ -2,16 +2,15 @@
 # #################################################################################################################### #
 # Filename: \PowerShell\Intune\App-Management-IntuneWin32.Template.ps1                                                 #
 # Repository: Code-Templates                                                                                           #
-# Created Date: Tuesday, October 1st 2024, 10:01:10 PM                                                                 #
-# Last Modified: Sunday, October 6th 2024, 8:53:30 PM                                                                  #
+# Created Date: Saturday, December 21st 2024, 6:42:23 PM                                                               #
+# Last Modified: Wednesday, January 8th 2025, 11:31:08 PM                                                              #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
-# Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
 #                                                                                                                      #
 # This code complies with: https://gist.github.com/Darnel-K/8badda0cabdabb15359350f7af911c90                           #
 #                                                                                                                      #
 # License: GNU General Public License v3.0 only - https://www.gnu.org/licenses/gpl-3.0-standalone.html                 #
-# Copyright (c) 2024 Darnel Kumar                                                                                      #
+# Copyright (c) 2024 - 2025 Darnel Kumar                                                                               #
 #                                                                                                                      #
 # This program is free software: you can redistribute it and/or modify                                                 #
 # it under the terms of the GNU General Public License as published by                                                 #
