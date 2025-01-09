@@ -3,7 +3,7 @@
 # Filename: \PowerShell\Intune\IntuneRegeditPSScriptTemplate.ps1                                                       #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Saturday, December 21st 2024, 6:42:23 PM                                                               #
-# Last Modified: Wednesday, January 8th 2025, 11:31:23 PM                                                              #
+# Last Modified: Thursday, January 9th 2025, 12:20:51 AM                                                               #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
@@ -49,6 +49,28 @@
     A sample command that uses the function or script, optionally followed by sample output and a description. Repeat this keyword for each example.
 #>
 
+# Script functions
+
+function init {
+    # Script initialisation function. This function contains the main code and calls to other functions.
+    # This function is called automatically at the bottom of the script
+    $SCRIPT_EXEC_MODE = "Update" # Update or Delete. Tells the script to either update the registry or delete the keys
+    $REG_DATA = @(
+        [PSCustomObject]@{
+            Path  = "" # Registry key path
+            Key   = "" # Registry property Key
+            Value = "" # Registry property value
+            Type  = "" # Binary, DWord, ExpandString, MultiString, String or QWord
+        }
+    )
+    if (beginRegistryUpdate -data $REG_DATA -mode $SCRIPT_EXEC_MODE) {
+        continue # Do something if registry update was successful
+    }
+    else {
+        continue # Do something if registry update was not successful
+    }
+}
+
 #################################
 #                               #
 #   REQUIRED SCRIPT VARIABLES   #
@@ -59,15 +81,6 @@
 # DO NOT LEAVE THESE VARIABLES BLANK
 
 $SCRIPT_NAME = "" # This is used in the window title and the event log entries.
-$SCRIPT_EXEC_MODE = "Update" # Update or Delete. Tells the script to either update the registry or delete the keys
-$REG_DATA = @(
-    [PSCustomObject]@{
-        Path  = "" # Registry key path
-        Key   = "" # Registry property Key
-        Value = "" # Registry property value
-        Type  = "" # Binary, DWord, ExpandString, MultiString, String or QWord
-    }
-)
 
 ################################################
 #                                              #
@@ -78,7 +91,11 @@ $REG_DATA = @(
 # Script functions - DO NOT CHANGE!
 
 function updateRegistry {
-    foreach ($i in ($REG_DATA | Sort-Object -Property Path)) {
+    param (
+        [Parameter()]
+        $data
+    )
+    foreach ($i in ($reg_data | Sort-Object -Property Path)) {
         if (!(Test-Path -Path $i.Path)) {
             try {
                 New-Item -Path $i.Path -Force -ErrorAction Stop | Out-Null
@@ -87,7 +104,7 @@ function updateRegistry {
             catch {
                 $CUSTOM_LOG.Fail("Failed to create registry path: $($i.Path)")
                 $CUSTOM_LOG.Error($Error[0])
-                Exit 1
+                return $false
             }
         }
         if ($i.Key) {
@@ -99,7 +116,7 @@ function updateRegistry {
                 catch {
                     $CUSTOM_LOG.Fail("Failed to make the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Key)`n - Value: $($i.Value)`n - Type: $($i.Type)")
                     $CUSTOM_LOG.Error($Error[0])
-                    Exit 1
+                    return $false
                 }
             }
             else {
@@ -110,17 +127,21 @@ function updateRegistry {
                 catch {
                     $CUSTOM_LOG.Fail("Failed to make the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Key)`n - Value: $($i.Value)`n - Type: $($i.Type)")
                     $CUSTOM_LOG.Error($Error[0])
-                    Exit 1
+                    return $false
                 }
             }
         }
     }
     $CUSTOM_LOG.Success("Completed registry update successfully.")
-    Exit 0
+    return $true
 }
 
 function removeRegistry {
-    foreach ($i in ($REG_DATA | Sort-Object -Property Path, Key -Descending)) {
+    param (
+        [Parameter()]
+        $data
+    )
+    foreach ($i in ($reg_data | Sort-Object -Property Path, Key -Descending)) {
         if (Test-Path -Path $i.Path) {
             if ($i.Key) {
                 try {
@@ -130,7 +151,7 @@ function removeRegistry {
                 catch {
                     $CUSTOM_LOG.Fail("Failed to remove registy property: $($i.Key) at path: $($i.Path)")
                     $CUSTOM_LOG.Error($Error[0])
-                    Exit 1
+                    return $false
                 }
             }
             else {
@@ -141,7 +162,7 @@ function removeRegistry {
                 catch {
                     $CUSTOM_LOG.Fail("Failed to remove registy path: $($i.Path)")
                     $CUSTOM_LOG.Error($Error[0])
-                    Exit 1
+                    return $false
                 }
             }
         }
@@ -150,14 +171,22 @@ function removeRegistry {
         }
     }
     $CUSTOM_LOG.Success("Completed registry update successfully.")
-    Exit 0
+    return $true
 }
 
-function init {
-    switch ($SCRIPT_EXEC_MODE) {
-        "Update" { updateRegistry }
-        "Delete" { removeRegistry }
-        Default { updateRegistry }
+function beginRegistryUpdate {
+    param (
+        [Parameter()]
+        $data,
+        [Parameter()]
+        [ValidateSet("Update", "Delete")]
+        [string]
+        $mode
+    )
+    switch ($mode) {
+        "Update" { return updateRegistry -data $data }
+        "Delete" { return removeRegistry -data $data }
+        Default { return updateRegistry -data $data }
     }
 }
 
