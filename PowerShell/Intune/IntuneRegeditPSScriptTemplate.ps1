@@ -3,7 +3,7 @@
 # Filename: \PowerShell\Intune\IntuneRegeditPSScriptTemplate.ps1                                                       #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Saturday, December 21st 2024, 6:42:23 PM                                                               #
-# Last Modified: Saturday, January 11th 2025, 7:35:37 PM                                                               #
+# Last Modified: Saturday, January 11th 2025, 7:40:39 PM                                                               #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
@@ -95,7 +95,7 @@ function updateRegistry {
         [Parameter()]
         $data
     )
-    foreach ($i in ($reg_data | Sort-Object -Property Path)) {
+    foreach ($i in ($data | Sort-Object -Property Path)) {
         if (!(Test-Path -Path $i.Path)) {
             try {
                 New-Item -Path $i.Path -Force -ErrorAction Stop | Out-Null
@@ -141,7 +141,7 @@ function removeRegistry {
         [Parameter()]
         $data
     )
-    foreach ($i in ($reg_data | Sort-Object -Property Path, Key -Descending)) {
+    foreach ($i in ($data | Sort-Object -Property Path, Key -Descending)) {
         if (Test-Path -Path $i.Path) {
             if ($i.Key) {
                 try {
