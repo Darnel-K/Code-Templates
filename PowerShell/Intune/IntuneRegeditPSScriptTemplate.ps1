@@ -3,7 +3,7 @@
 # Filename: \PowerShell\Intune\IntuneRegeditPSScriptTemplate.ps1                                                       #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Saturday, December 21st 2024, 6:42:23 PM                                                               #
-# Last Modified: Thursday, January 9th 2025, 12:20:51 AM                                                               #
+# Last Modified: Saturday, January 11th 2025, 7:35:37 PM                                                               #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
@@ -420,4 +420,5 @@ class CustomLog {
 Clear-Host
 sig
 checkRunIn64BitPowershell
+$CUSTOM_LOG.Information("Script PID: $PID")
 init
