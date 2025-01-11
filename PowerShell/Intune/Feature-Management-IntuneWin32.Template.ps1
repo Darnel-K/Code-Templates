@@ -3,7 +3,7 @@
 # Filename: \PowerShell\Intune\Feature-Management-IntuneWin32.Template.ps1                                             #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Saturday, December 21st 2024, 6:42:23 PM                                                               #
-# Last Modified: Wednesday, January 8th 2025, 11:31:16 PM                                                              #
+# Last Modified: Saturday, January 11th 2025, 7:35:02 PM                                                               #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
@@ -77,6 +77,7 @@ $ENABLE_PARENT_FEATURES = $false
 # Script functions - DO NOT CHANGE!
 
 function init {
+    $CUSTOM_LOG.Information("Script PID: $PID")
     switch ($Mode) {
         'Enable' {
             $CUSTOM_LOG.Information("Starting $SCRIPT_NAME in $Mode mode")
