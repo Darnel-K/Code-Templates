@@ -3,7 +3,7 @@
 # Filename: \PowerShell\Intune\IntuneRegeditPSScriptTemplate.ps1                                                       #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Saturday, December 21st 2024, 6:42:23 PM                                                               #
-# Last Modified: Saturday, January 11th 2025, 7:40:39 PM                                                               #
+# Last Modified: Saturday, January 11th 2025, 7:41:14 PM                                                               #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
