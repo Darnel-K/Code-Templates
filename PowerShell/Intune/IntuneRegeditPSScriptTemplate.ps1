@@ -3,7 +3,7 @@
 # Filename: \PowerShell\Intune\IntuneRegeditPSScriptTemplate.ps1                                                       #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Saturday, December 21st 2024, 6:42:23 PM                                                               #
-# Last Modified: Saturday, January 11th 2025, 7:41:14 PM                                                               #
+# Last Modified: Sunday, January 12th 2025, 9:30:47 PM                                                                 #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
@@ -63,11 +63,10 @@ function init {
             Type  = "" # Binary, DWord, ExpandString, MultiString, String or QWord
         }
     )
-    if (beginRegistryUpdate -data $REG_DATA -mode $SCRIPT_EXEC_MODE) {
-        continue # Do something if registry update was successful
-    }
-    else {
-        continue # Do something if registry update was not successful
+    if (-not (beginRegistryUpdate -data $REG_DATA -mode $SCRIPT_EXEC_MODE)) {
+        $CUSTOM_LOG.Fail("Unable to update registry data")
+        $CUSTOM_LOG.Error($Error)
+        Exit 1
     }
 }
 
