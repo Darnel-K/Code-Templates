@@ -1,9 +1,9 @@
 #!/bin/bash
 # #################################################################################################################### #
-# Filename: \Shell Script\Generic\ShellScript.sh                                                                       #
+# Filename: \Shell Script\Generic\BashScript.sh                                                                        #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Tuesday, April 15th 2025, 11:36:45 PM                                                                  #
-# Last Modified: Friday, April 18th 2025, 10:48:01 PM                                                                  #
+# Last Modified: Saturday, April 19th 2025, 3:50:59 PM                                                                 #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
