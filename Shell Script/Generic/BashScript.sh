@@ -3,7 +3,7 @@
 # Filename: \Shell Script\Generic\BashScript.sh                                                                        #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Tuesday, April 15th 2025, 11:36:45 PM                                                                  #
-# Last Modified: Saturday, April 19th 2025, 3:50:59 PM                                                                 #
+# Last Modified: Saturday, April 19th 2025, 6:23:46 PM                                                                 #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
@@ -23,29 +23,31 @@
 # GNU General Public License for more details.                                                                         #
 # #################################################################################################################### #
 
-SCRIPT_NAME=""
+# Script functions
 
 function init {
+    # Script initialisation function. This function contains the main code and calls to other functions.
+    # This function is called automatically at the bottom of the script
+    # Append ">&3" to the end of an echo line to print to the console
 
 }
 
-function initTerminal {
-    tput clear
-    SCRIPT_NAME="Generic.BashScript.${SCRIPT_NAME// /}"
+#################################
+#                               #
+#   REQUIRED SCRIPT VARIABLES   #
+#                               #
+#################################
 
-    # Check if the current user is the system user (root)
-    [ "$(id -u)" -eq 0 ] && IS_SYSTEM=true || IS_SYSTEM=false
+# DO NOT REMOVE THESE VARIABLES
+# DO NOT LEAVE THESE VARIABLES BLANK
 
-    # Check if the current user is an administrator (has sudo privileges)
-    [ sudo -n true ] 2>/dev/null && IS_ADMIN=true || IS_ADMIN=false
+SCRIPT_NAME="" # This is used in the window title and the log name and entries.
 
-    # Get the name of the executing user
-    EXEC_USER=$(whoami)
-
-    # Get the process ID of the current script
-    PID=$$
-
-}
+################################################
+#                                              #
+#   DO NOT EDIT ANYTHING BELOW THIS MESSAGE!   #
+#                                              #
+################################################
 
 function initWorkingDir {
     ROOT_DIR="/opt/ABYSS.ORG.UK"
@@ -67,6 +69,23 @@ function initWorkingDir {
     chmod -R 755 $INTUNE_APPLICATIONS_DIR
 }
 
+function initTerminal {
+    tput clear
+    SCRIPT_NAME="Generic.BashScript.${SCRIPT_NAME// /}"
+    [ "$(id -u)" -eq 0 ] && IS_SYSTEM=true || IS_SYSTEM=false
+    [ sudo -n true ] 2>/dev/null && IS_ADMIN=true || IS_ADMIN=false
+    EXEC_USER=$(whoami)
+    PID=$$
+    SCRIPT_FILENAME=$(basename "$0")
+    len=($((${#SCRIPT_NAME} + 13)) $((${#SCRIPT_FILENAME} + 10)) 20 42 29 40 63 62 61 44)
+    for i in "${len[@]}"; do
+        if ((i > len_max)); then
+            len_max=$i
+        fi
+    done
+
+}
+
 function initLog {
     LOG_FILE=$SCRIPT_NAME"$(date +"%Y%m%d-%H%M%S").log"
     exec 3>&1 1>"$LOG_DIR/$LOG_FILE" 2>&1
@@ -77,4 +96,6 @@ function initLog {
 initTerminal
 initWorkingDir
 initLog
+echo "Script PID: $PID" >&3
+echo "Exec User: $EXEC_USER" >&3
 init
