@@ -3,7 +3,7 @@
 # Filename: \Shell Script\Generic\BashScript.sh                                                                        #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Tuesday, April 15th 2025, 11:36:45 PM                                                                  #
-# Last Modified: Saturday, April 19th 2025, 6:23:46 PM                                                                 #
+# Last Modified: Friday, May 2nd 2025, 11:18:43 PM                                                                     #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
@@ -83,7 +83,8 @@ function initTerminal {
             len_max=$i
         fi
     done
-
+    padding=($((len_max - ${len[0]})) $((len_max - ${len[1]})) $((len_max - ${len[2]})) $((len_max - ${len[3]})) $((len_max - ${len[4]})) $((len_max - ${len[5]})) $((len_max - ${len[6]})) $((len_max - ${len[7]})) $((len_max - ${len[8]})) $((len_max - ${len[9]})))
+    echo -e "####$(printf "%${len_max}s" | tr ' ' '#')####\n#   $(printf "%${len_max}s")   #\n#   Script Name: $SCRIPT_NAME$(printf "%${padding[0]}s")   #\n#   Filename: $SCRIPT_FILENAME$(printf "%${padding[1]}s")   #\n#   $(printf "%${len_max}s")   #\n#   Author: Darnel Kumar$(printf "%${padding[2]}s")   #\n#   Author GitHub: https://github.com/Darnel-K$(printf "%${padding[3]}s")   #\n#   Copyright \u00A9 $(date +"%Y") Darnel Kumar$(printf "%${padding[4]}s")   #\n#   $(printf "%${len_max}s")   #\n#   $(printf "%${len_max}s" | tr ' ' '-')   #\n#   $(printf "%${len_max}s")   #\n#   License: GNU General Public License v3.0$(printf "%${padding[5]}s")   #\n#   $(printf "%${len_max}s")   #\n#   This program is distributed in the hope that it will be useful,$(printf "%${padding[6]}s")   #\n#   but WITHOUT ANY WARRANTY; without even the implied warranty of$(printf "%${padding[7]}s")   #\n#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the$(printf "%${padding[8]}s")   #\n#   GNU General Public License for more details.$(printf "%${padding[9]}s")   #\n#   $(printf "%${len_max}s")   #\n####$(printf "%${len_max}s" | tr ' ' '#')####\n"
 }
 
 function initLog {
