@@ -3,7 +3,7 @@
 # Filename: \Shell Script\Generic\BashScript.sh                                                                        #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Tuesday, April 15th 2025, 11:36:45 PM                                                                  #
-# Last Modified: Friday, May 2nd 2025, 11:18:43 PM                                                                     #
+# Last Modified: Monday, May 5th 2025, 1:03:55 AM                                                                      #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
@@ -62,11 +62,11 @@ function initWorkingDir {
     [ -d $INTUNE_APPLICATIONS_DIR ] || mkdir -p $INTUNE_APPLICATIONS_DIR
     [ getent group "root" ] >/dev/null 2>&1 && chown -R root:root $ROOT_DIR
     [ getent group "wheel" ] >/dev/null 2>&1 && chown -R root:wheel $ROOT_DIR
-    chmod -R 755 $ROOT_DIR
-    chmod -R 644 $LOG_DIR
-    chmod -R 755 $INTUNE_DIR
+    chmod 755 $ROOT_DIR
+    chmod 755 $LOG_DIR
+    chmod 755 $INTUNE_DIR
     chmod -R 755 $INTUNE_RESOURCES_DIR
-    chmod -R 755 $INTUNE_APPLICATIONS_DIR
+    chmod 755 $INTUNE_APPLICATIONS_DIR
 }
 
 function initTerminal {
@@ -88,10 +88,11 @@ function initTerminal {
 }
 
 function initLog {
-    LOG_FILE=$SCRIPT_NAME"$(date +"%Y%m%d-%H%M%S").log"
+    set -o functrace
+    LOG_FILE=$SCRIPT_NAME".$(date +"%Y%m%d-%H%M%S").log"
     exec 3>&1 1>"$LOG_DIR/$LOG_FILE" 2>&1
     trap "echo 'ERROR: An error occurred during execution, check log $LOG_FILE for details.' >&3" ERR
-    trap '{ set +x; } 2>/dev/null; echo -n "[$(date -Is)]  "; set -x' DEBUG
+    trap '[[ ${FUNCNAME[0]} != "$BASH_COMMAND" ]] 2>/dev/null && { set +x; } 2>/dev/null; ts="[$(date -Is)]"; [[ ${#FUNCNAME[@]} -gt 1 ]] && echo -n "$ts [line: $LINENO] [func: ${FUNCNAME[0]}]  " || echo -n "$ts [line: $LINENO]  "; set -x' DEBUG
 }
 
 initTerminal
