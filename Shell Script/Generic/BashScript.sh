@@ -2,8 +2,8 @@
 # #################################################################################################################### #
 # Filename: \Shell Script\Generic\BashScript.sh                                                                        #
 # Repository: Code-Templates                                                                                           #
-# Created Date: Monday, May 5th 2025, 1:04:43 AM                                                                       #
-# Last Modified: Wednesday, May 7th 2025, 9:51:35 PM                                                                   #
+# Created Date: Tuesday, April 15th 2025, 11:36:45 PM                                                                  #
+# Last Modified: Wednesday, May 7th 2025, 10:04:01 PM                                                                  #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
@@ -54,19 +54,19 @@ function initWorkingDir {
     [ -d $ROOT_DIR ] || mkdir -p $ROOT_DIR
     LOG_DIR="$ROOT_DIR/logs"
     [ -d $LOG_DIR ] || mkdir -p $LOG_DIR
-    INTUNE_DIR="$ROOT_DIR/Intune"
-    [ -d $INTUNE_DIR ] || mkdir -p $INTUNE_DIR
-    INTUNE_RESOURCES_DIR="$INTUNE_DIR/Resources"
-    [ -d $INTUNE_RESOURCES_DIR ] || mkdir -p $INTUNE_RESOURCES_DIR
-    INTUNE_APPLICATIONS_DIR="$INTUNE_DIR/Applications"
-    [ -d $INTUNE_APPLICATIONS_DIR ] || mkdir -p $INTUNE_APPLICATIONS_DIR
+    DATA_DIR="$ROOT_DIR/Data"
+    [ -d $DATA_DIR ] || mkdir -p $DATA_DIR
+    DATA_RESOURCES_DIR="$DATA_DIR/Resources"
+    [ -d $DATA_RESOURCES_DIR ] || mkdir -p $DATA_RESOURCES_DIR
+    DATA_APPLICATIONS_DIR="$DATA_DIR/Applications"
+    [ -d $DATA_APPLICATIONS_DIR ] || mkdir -p $DATA_APPLICATIONS_DIR
     [ getent group "root" ] >/dev/null 2>&1 && chown -R root:root $ROOT_DIR
     [ getent group "wheel" ] >/dev/null 2>&1 && chown -R root:wheel $ROOT_DIR
     chmod 755 $ROOT_DIR
     chmod 755 $LOG_DIR
-    chmod 755 $INTUNE_DIR
-    chmod -R 755 $INTUNE_RESOURCES_DIR
-    chmod 755 $INTUNE_APPLICATIONS_DIR
+    chmod 755 $DATA_DIR
+    chmod -R 755 $DATA_RESOURCES_DIR
+    chmod 755 $DATA_APPLICATIONS_DIR
 }
 
 function initTerminal {
