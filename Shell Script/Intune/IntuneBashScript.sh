@@ -3,7 +3,7 @@
 # Filename: \Shell Script\Intune\IntuneBashScript.sh                                                                   #
 # Repository: Code-Templates                                                                                           #
 # Created Date: Monday, May 5th 2025, 1:04:43 AM                                                                       #
-# Last Modified: Monday, May 5th 2025, 1:05:31 AM                                                                      #
+# Last Modified: Wednesday, May 7th 2025, 9:51:35 PM                                                                   #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
@@ -52,13 +52,13 @@ SCRIPT_NAME="" # This is used in the window title and the log name and entries.
 function initWorkingDir {
     ROOT_DIR="/opt/ABYSS.ORG.UK"
     [ -d $ROOT_DIR ] || mkdir -p $ROOT_DIR
-    LOG_DIR="/opt/ABYSS.ORG.UK/logs"
+    LOG_DIR="$ROOT_DIR/logs"
     [ -d $LOG_DIR ] || mkdir -p $LOG_DIR
-    INTUNE_DIR="/opt/ABYSS.ORG.UK/Intune"
+    INTUNE_DIR="$ROOT_DIR/Intune"
     [ -d $INTUNE_DIR ] || mkdir -p $INTUNE_DIR
-    INTUNE_RESOURCES_DIR="/opt/ABYSS.ORG.UK/Intune/Resources"
+    INTUNE_RESOURCES_DIR="$INTUNE_DIR/Resources"
     [ -d $INTUNE_RESOURCES_DIR ] || mkdir -p $INTUNE_RESOURCES_DIR
-    INTUNE_APPLICATIONS_DIR="/opt/ABYSS.ORG.UK/Intune/Applications"
+    INTUNE_APPLICATIONS_DIR="$INTUNE_DIR/Applications"
     [ -d $INTUNE_APPLICATIONS_DIR ] || mkdir -p $INTUNE_APPLICATIONS_DIR
     [ getent group "root" ] >/dev/null 2>&1 && chown -R root:root $ROOT_DIR
     [ getent group "wheel" ] >/dev/null 2>&1 && chown -R root:wheel $ROOT_DIR
